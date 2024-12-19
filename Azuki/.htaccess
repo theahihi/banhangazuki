@@ -1,0 +1,9 @@
+# Bật chế độ Rewrite Engine
+RewriteEngine On
+
+# Bỏ qua các tệp và thư mục hiện có (ảnh, CSS, JS, ...)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Chuyển tất cả yêu cầu còn lại đến index.php
+RewriteRule ^ index.php [QSA,L]

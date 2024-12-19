@@ -1,0 +1,73 @@
+/* Toàn bộ bảng */
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 10px; /* Kích thước chữ */
+  text-align: center; /* Căn giữa nội dung */
+  background-color: #fff; /* Màu nền bảng */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+  border-radius: 8px; /* Bo góc bảng */
+  overflow: hidden;
+}
+
+/* Header của bảng */
+.product-table thead th {
+  background-color: #1f2c38; /* Màu nền tiêu đề */
+  color: white; /* Màu chữ tiêu đề */
+  font-weight: bold;
+  padding: 12px; /* Khoảng cách bên trong ô */
+  border: none;
+  text-transform: uppercase; /* Viết hoa chữ */
+}
+
+/* Các dòng trong bảng */
+.product-table tbody tr {
+  border-bottom: 1px solid #ddd; /* Đường viền dưới mỗi dòng */
+}
+
+.product-table tbody tr:last-child {
+  border-bottom: none; /* Xóa đường viền dưới cùng */
+}
+
+/* Các ô trong bảng */
+.product-table tbody td {
+  padding: 10px; /* Khoảng cách bên trong ô */
+  color: #333; /* Màu chữ */
+}
+
+/* Màu nền xen kẽ các dòng */
+.product-table tbody tr:nth-child(odd) {
+  background-color: #f9f9f9; /* Màu nền cho dòng lẻ */
+}
+
+.product-table tbody tr:nth-child(even) {
+  background-color: #fefefe; /* Màu nền cho dòng chẵn */
+}
+
+/* Hiệu ứng hover */
+.product-table tbody tr:hover {
+  background-color: #f1f1f1; /* Màu nền khi hover */
+  cursor: pointer; /* Con trỏ thay đổi khi di chuột */
+}
+
+/* Responsive bảng */
+@media (max-width: 768px) {
+  .product-table {
+    font-size: 12px; /* Giảm kích thước chữ trên màn hình nhỏ */
+  }
+  .product-table thead {
+    display: none; /* Ẩn tiêu đề bảng trên màn hình nhỏ */
+  }
+  .product-table tbody tr {
+    display: block;
+    margin-bottom: 10px;
+    background: none; /* Xóa màu nền dòng */
+  }
+  .product-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    padding: 8px;
+  }
+}

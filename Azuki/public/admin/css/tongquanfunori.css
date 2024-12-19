@@ -1,0 +1,57 @@
+/* Định dạng tổng quan */
+
+.overview {
+  display: grid;
+  grid-template-columns: 300px 300px; /* Hai cột có chiều rộng 300px */
+  gap: 10px; /* Khoảng cách giữa các ô */
+  max-width: 640px; /* Giới hạn độ rộng tối đa */
+  max-height: 300px;
+  margin: 0 auto; /* Căn giữa */
+}
+
+/* Điều chỉnh chiều cao các ô */
+.overview-item {
+  width: 300px; /* Đặt chiều rộng của ô cố định */
+  height: 250px; /* Đặt chiều cao của mỗi ô cố định */
+  padding: 20px;
+  background-color: #ecf0f1;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Điều chỉnh nội dung bên trong các ô */
+.overview-item h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.overview-item p {
+  font-size: 26px;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+.overview-item .label {
+  font-size: 14px;
+  color: #95a5a6;
+}
+
+.overview-item .value {
+  font-size: 30px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .overview {
+    grid-template-columns: 1fr; /* Chuyển thành 1 cột khi màn hình nhỏ */
+    gap: 15px; /* Khoảng cách giữa các ô khi là 1 cột */
+  }
+}
