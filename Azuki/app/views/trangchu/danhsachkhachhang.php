@@ -1,46 +1,6 @@
 
 <style>
-  /* Phần nền tối của popup */
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none; /* Ẩn popup ban đầu */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
 
-/* Nội dung chính của popup */
-.popup-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 50%;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    position: relative;
-}
-
-/* Nút đóng popup */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #aaa;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: #000;
-}
-
-
-/* Container chính của bảng */
 .table {
     display: flex;
     flex-direction: column;
@@ -304,6 +264,78 @@
     .product-table tr th {
         background-color: #003366;
     }
+    <style>
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.popup-content h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.popup-content label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.popup-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.button-save {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.button-save:hover {
+    background-color: #218838;
+}
+</style>
+
 </style>
 
 
@@ -313,20 +345,14 @@
     <form id="filterForm" style="margin-bottom: 20px;">
     <div style="display: flex; gap: 15px; align-items: center;">
         <div>
-            <label for="khachhang">Khách hàng:</label>
-            <input style="width:155px" type="text" id="khachhang" name="khachhang" placeholder="Nhập tên khách hàng">
+            <label for="khachhang">Nhập thông tin tìm kiếm:</label>
+            <input style="width:200px;" type="text" id="khachhang" name="noidung" placeholder=" Khách hàng hoặc số điện thoại">
         </div>
-        <div>
-            <label for="madonhang">Số điện thoại:</label>
-            <input type="tel" id="sdt" name="sdt" placeholder="Nhập số điện thoại" oninput="validatePhoneNumber(this)">
-        </div>
+
+       
        
         
-        <div>
-            <button type="button" id="filterButton" style="background-color: #3498DB; color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer;">
-                Lọc
-            </button>
-        </div>
+      
     </div>
 </form>
       <a href="/azuki/trangchu/danhsachkhachhang" style="text-decoration: none;">
@@ -348,6 +374,8 @@
           <th style="width:100px">Tổng tiền mua</th>
           <th style="width:50px">Số lần mua</th>
           <th style="width:50px">Số lượng mua</th>
+          <th style="width:50px">Thao tác</th>
+
         </tr>
       </thead>
       <tbody>
@@ -362,7 +390,7 @@
          <td><?php echo $row['sodienthoai'] ;?></td>
          <td><?php echo $row['email'] ;?></td>
          <td><?php echo number_format($row['tongtienmua'], 0, '', ','); ?>₫</td>
-         <td><?php echo $row['solanmua']  ;?></td>
+         <td><?php echo $row['solanmua']  ;?>  </td>
          <td><?php
          while($rowslmua=mysqLi_fetch_array($slmua)){
             if($rowslmua['sodienthoai']==$row['sodienthoai']){
@@ -370,8 +398,33 @@
             }
          }
          
-         ?></td>
-         </tr>
+         ?></td>   
+        <td>
+    <button class="btn edit" onclick="openEditPopup('<?php echo $row['id']; ?>  ' ,'<?php echo $row['hoten']; ?>', '<?php echo $row['sodienthoai']; ?>', '<?php echo $row['email']; ?>')" style="background-color: #0056b3; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+        <i class="fas fa-edit" style="color: white; cursor: pointer;"></i>
+    </button>
+</td>
+
+                        <div class="popup" id="editCustomerPopup">
+    <div class="popup-content">
+        <span class="close" onclick="closePopup()">&times;</span>
+        <h2>Sửa Thông Tin Khách Hàng</h2>
+        <form action="/azuki/trangchu/suakhachhang" method="post">
+        <input type="hidden" id="id" name="id" required>
+            <label for="editName">Tên khách hàng:</label>
+            <input type="text" id="editName" name="name" required>
+
+            <label for="editPhone">Số điện thoại:</label>
+            <input type="text" id="editPhone" name="phone" required>
+
+            <label for="editEmail">Email:</label>
+            <input type="email" id="editEmail" name="email" required>
+
+            <button type="submit" class="button-save" >Lưu</button>
+        </form>
+    </div>
+</div>
+
          <?php $i++; } ?>
       </tbody>
     </table>
@@ -399,25 +452,160 @@ function validatePhoneNumber(input) {
     }
     
 
-  document.getElementById('filterButton').addEventListener('click', function () {
-    // Thu thập dữ liệu từ form
+    document.getElementById('filterForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Ngăn không reload trang khi submit form
     const formData = new FormData(document.getElementById('filterForm'));
 
-    // Gửi yêu cầu AJAX
+    // Gửi yêu cầu AJAX để lọc
     fetch('/azuki/trangchu/danhsachkhachhang_loc', {
         method: 'POST',
         body: formData
     })
         .then(response => response.text()) // Nhận phản hồi từ server (HTML)
         .then(data => {
-            document.getElementById('orderList2').innerHTML = data; // Cập nhật kết quả vào #orderList
+            document.getElementById('orderList2').innerHTML = data; // Cập nhật kết quả vào #orderList2
         })
         .catch(error => console.error('Error:', error));
 });
 
+document.querySelectorAll('#filterForm input').forEach(input => {
+    input.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('filterForm').dispatchEvent(new Event('submit')); // Kích hoạt sự kiện submit
+        }
+    });
+});
+function openEditPopup(id,name, phone, email) {
+    // Điền dữ liệu khách hàng vào form
+    document.getElementById("id").value = id;
+    document.getElementById("editName").value = name;
+    document.getElementById("editPhone").value = phone;
+    document.getElementById("editEmail").value = email;
+
+    // Hiển thị popup
+    document.getElementById("editCustomerPopup").style.display = "flex";
+}
+
+function closePopup() {
+    // Ẩn popup
+    document.getElementById("editCustomerPopup").style.display = "none";
+}
+
+
 
 
 </script>
+
+
+<?php /* if (isset($_SESSION['message'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            alert("<?php echo $_SESSION['message']; ?>");
+        });
+    </script>
+    <?php unset($_SESSION['message']); ?>
+<?php endif; */ ?>
+
+
+<?php 
+if (isset($_SESSION['message'])) {
+  ?>
+<style>
+    /* Nền tối của popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Ẩn popup mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung chính của popup */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 2px solid #6a0dad; /* Đường viền tím */
+}
+
+/* Biểu tượng thành công */
+.popup-content i {
+    font-size: 50px;
+    color: #28a745; /* Màu xanh lá cây */
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề của popup */
+.popup-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00cc00; /* Màu xanh lá cây */
+    margin: 10px 0;
+}
+
+/* Nội dung thông báo */
+.popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Nút đóng popup */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000; /* Màu đỏ */
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: #000;
+}
+</style>
+  <?php
+    echo "<div id='popup' class='popup'>
+            <div class='popup-content'>
+              <span class='close'>&times;</span>
+              <i class='fa fa-check-circle'></i>
+              <h3>THÔNG BÁO</h3>
+              <p>" . $_SESSION['message'] . "</p>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.popup .close');
+                
+                // Hiển thị popup khi trang tải xong
+                popup.style.display = 'flex';
+
+                // Đóng popup khi nhấn nút close
+                closeBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                });
+
+                // Tự động đóng popup sau 5 giây
+                setTimeout(function () {
+                    popup.style.display = 'none';
+                }, 5000);
+            });
+          </script>";
+    unset($_SESSION['message']);
+}
+?>
 
 
 

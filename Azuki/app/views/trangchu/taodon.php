@@ -12,7 +12,7 @@
         background: white;
         padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #f4f6f8;
     }
 
     h1 {
@@ -156,7 +156,8 @@
     }
 
     .form-group input {
-        max-width: 48%;
+        max-width: 63%;
+        font-size: 10px
     }
 
     .form-group select {
@@ -247,7 +248,8 @@ h1 {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 11.5px;
+    width: 200px ;
 }
 
 .form-group input:focus {
@@ -271,6 +273,7 @@ h1 {
     animation: slide-up 0.3s ease-out; /* Animation for sliding up */
     top: calc(100% + 5px); /* Appear below the input field */
     left: 0;
+    margin-top: -8px;
 }
 
 /* Slide-up animation */
@@ -310,29 +313,192 @@ h1 {
 }
 
 #searchResultsKh span {
-    font-size: 14px;
+    font-size: 11.5px;
     color: #333;
     font-weight: bold;
 }
 
-    </style>
+.trong{
+    color:rgb(183, 179, 179) ;
+    font-size:30px;
+
+}
+.tongtien {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Đẩy nội dung sang bên phải */
+    margin-top: 20px;
+   
+   
+   
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+  
+    width: auto; /* Chiều rộng tự động */
+    max-width: 300px; /* Đặt giới hạn chiều rộng */
+    margin-left: auto; /* Đẩy toàn bộ div sang bên phải */
+}
+
+.tongtien label {
+    margin-right: 10px;
+    font-size: 16px;
+    color: #007bff;
+    text-transform: capitalize;
+}
+
+.khungdonhang {
+    height: 310px; /* Đặt chiều cao cố định */
+    overflow-y: auto; /* Hiển thị thanh cuộn khi nội dung vượt quá chiều cao */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 10px; /* Khoảng cách với phần tổng tiền */
+}
+
+.tongtien {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px; /* Đảm bảo khoảng cách với phần khung danh sách */
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    width: auto;
+    max-width: 300px;
+    margin-left: auto; /* Đẩy về bên phải */
+}
+
+.tongtien input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    background-color: #ffffff;
+    text-align: right;
+    width: 150px;
+    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tongtien input[readonly] {
+    background-color: #f4f6f8;
+    cursor: not-allowed;
+}
+
+.tongtien input:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 10px;
+}
+
+table th {
+    background-color: #007bff;
+    color: white;
+    text-transform: uppercase;
+    position: sticky; /* Giữ thẻ <th> cố định */
+    top: 0; /* Cố định <thead> ở đầu bảng */
+    z-index: 1; /* Đặt <th> trên các phần khác */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng đổ bóng */
+}
+
+
+/* Nền tối của popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Ẩn popup mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung chính của popup */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 2px solid #6a0dad; /* Đường viền tím */
+}
+
+/* Biểu tượng thành công */
+.popup-content i {
+    font-size: 50px;
+    color: #28a745; /* Màu xanh lá cây */
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề của popup */
+.popup-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00cc00; /* Màu xanh lá cây */
+    margin: 10px 0;
+}
+
+/* Nội dung thông báo */
+.popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Nút đóng popup */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000; /* Màu đỏ */
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: #000;
+}
+</style>
+
+
+
+
+
 
 <body>
 
 <form action="/azuki/trangchu/taodonhang" method="post" onsubmit="return validateForm(event)">
 
 <div class="content" style="margin-left: 250px; padding: 20px;">
-
 <div class="container">
         <div class="main-content">
                 <!-- Left Panel -->
                 <div class="left-panel">
                 <div class="search-bar">
-                    <input id="searchInput" type="text" placeholder="Tìm sản phẩm">
+                
+                    <input id="searchInput" type="text" placeholder=" 🔎 Nhập tên sản phẩm ">
                     <div id="searchResults"></div>
                 </div>
     
-                <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+                <div class="khungdonhang" style=" overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
     <table>
         <thead>
             <tr>
@@ -341,23 +507,40 @@ h1 {
                 <th>Giá</th>
                 <th>SL</th>
                 <th>Thành tiền</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody id="productTableBody">
-            <!-- Hàng mẫu -->
+            <tr id="emptyRow" >
+    <td colspan="5" style="text-align: center; height: 230px; border: none;">
+        <div class="trong">Đơn hàng trống, hãy chọn sản phẩm...</div>
+    </td>
+</tr>
+        
         </tbody>
     </table>
+   
 </div>
+             <div class=" tongtien" style="margin-top:-1px">
+                        <label for="total">Tổng tiền : </label>
+                        <input type="text" id="total" name="tongtien"  readonly value="0">
+                    </div>
 
             </div>
     
                 <!-- Right Panel -->
                 <div class="right-panel">
-                    <div class="summary">
-                        <label for="total">Tổng tiền hàng</label>
-                        <input type="text" id="total" name="tongtien" readonly value="0">
-                    </div>
-    <br>
+    <div class="summary">
+    <label for="total">Thông tin khách</label>
+    <div class="thongtinkh">
+            <div class="form-group" style="position: relative;">
+                <input type="text" id="searchInputkh"  name="sdt" placeholder="Nhập số điện thoại">
+                <div id="searchResultsKh"></div>
+                <input type="text" id="hoten" name="hoten" placeholder="Tên khách">
+            </div>
+            
+        </div>
+    </div>
                     <div class="summary">
                         <label for="discount">Phương thức thanh toán</label>
                         <select name="phuongthuc" id="" style=" padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; background-color: #fff; color: #2c3e50; cursor: pointer; outline: none; transition: all 0.3s ease;">
@@ -365,6 +548,7 @@ h1 {
     <option value="Chuyển khoản" style="background-color: #fff; color: #2c3e50; padding: 10px;">Chuyển khoản</option>
 </select>
                     </div>
+                
     <br>
                    <div class="summary">
                         <label for="total">Ghi chú (Nếu có)</label>
@@ -372,23 +556,12 @@ h1 {
                     </div>
 
                     <div class="actions">
-                        <button id="save">Lưu</button>
+                        <button id="save">Tạo đơn hàng</button>
                     </div>
                 </div>
             </div>
 </div>
-<div class="container2">
-    <h1>Khách hàng</h1>
-    <div class="form-group" style="position: relative;">
-        <input type="text" id="searchInputkh"  name="sdt" placeholder="Nhập số điện thoại">
-        <div id="searchResultsKh"></div>
-        <input type="text" id="hoten" name="hoten" placeholder="Tên khách">
-    </div>
-    <div class="form-group">
-        <input type="text" id="email" name="email" placeholder="Email">
-        <input type="text" id="facebook" name="facebook" placeholder="Facebook">
-    </div>
-</div>
+
             
         </div>
     
@@ -399,15 +572,39 @@ h1 {
  </form>
  <?php 
 if (isset($_SESSION['thanhcong'])) {
-    echo "<script>
-            window.onload = function() {
-              alert('" . $_SESSION['thanhcong'] . "');
-            }
+    echo "<div id='popup' class='popup'>
+            <div class='popup-content'>
+              <span class='close'>&times;</span>
+              <i class='fa fa-check-circle'></i>
+              <h3>THÔNG BÁO</h3>
+              <p>" . $_SESSION['thanhcong'] . "</p>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.popup .close');
+                
+                // Hiển thị popup khi trang tải xong
+                popup.style.display = 'flex';
+
+                // Đóng popup khi nhấn nút close
+                closeBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                });
+
+                // Tự động đóng popup sau 5 giây
+                setTimeout(function () {
+                    popup.style.display = 'none';
+                }, 5000);
+            });
           </script>";
     unset($_SESSION['thanhcong']);
-  }
-
+}
 ?>
+
+
+
 <script>
 // Fetch suggestions for customers
 function fetchSuggestions(query) {
@@ -465,23 +662,44 @@ function updateTotalAmount() {
     updateHiddenInput();
 }
 
+// Hàm kiểm tra và hiển thị hoặc ẩn dòng trống
+function toggleEmptyRow() {
+    const emptyRow = document.getElementById("emptyRow");
+    const productRows = document.querySelectorAll("#productTableBody tr:not(#emptyRow)").length; // Chỉ đếm dòng không phải dòng trống
+
+    if (productRows > 0) {
+        emptyRow.style.display = "none"; // Ẩn dòng trống
+    } else {
+        emptyRow.style.display = ""; // Hiển thị dòng trống
+    }
+}
+
 // Thêm sản phẩm vào bảng
 function addProductToTable(productId, productName, productPrice) {
     const tableBody = document.getElementById("productTableBody");
+
+    // Kiểm tra xem sản phẩm đã tồn tại chưa
+    const existingProduct = productArray.find(item => item.productId === productId);
+    if (existingProduct) {
+        alert("Sản phẩm này đã được thêm!");
+        return;
+    }
+
     const newRow = document.createElement("tr");
     const currentRowCount = tableBody.querySelectorAll("tr").length;
 
     newRow.innerHTML = `
-        <td>${currentRowCount + 1}</td>
+        <td>${currentRowCount}</td>
         <td>${productName}</td>
         <td>${parseFloat(productPrice).toLocaleString()}</td>
         <td><input type="number" style="width: 60px;" value="1" min="1" class="quantity-input"></td>
         <td class="total-price">${parseFloat(productPrice).toLocaleString()}</td>
-        <td><button type="button" class="remove-btn">X</button></td>
+        <td><button type="button" class="remove-btn"><i class="fa fa-trash" ></i></button></td>
     `;
 
     tableBody.appendChild(newRow);
 
+    // Thêm sản phẩm vào mảng
     productArray.push({
         productId: productId,
         productName: productName,
@@ -490,11 +708,11 @@ function addProductToTable(productId, productName, productPrice) {
     });
 
     const quantityInput = newRow.querySelector(".quantity-input");
-    const totalPriceCell = newRow.querySelector(".total-price");
     const removeButton = newRow.querySelector(".remove-btn");
 
     quantityInput.addEventListener("input", function () {
         const quantity = parseInt(this.value) || 1;
+        const totalPriceCell = newRow.querySelector(".total-price");
         totalPriceCell.textContent = (quantity * parseFloat(productPrice)).toLocaleString();
 
         const productIndex = productArray.findIndex(item => item.productId === productId);
@@ -509,8 +727,10 @@ function addProductToTable(productId, productName, productPrice) {
         productArray = productArray.filter(item => item.productId !== productId);
         updateRowNumbers();
         updateTotalAmount();
+        toggleEmptyRow();
     });
 
+    toggleEmptyRow();
     updateTotalAmount();
 }
 
@@ -520,10 +740,14 @@ function updateHiddenInput() {
 }
 
 // Cập nhật lại số thứ tự hàng
+// Hàm cập nhật lại số thứ tự hàng
 function updateRowNumbers() {
-    document.querySelectorAll("#productTableBody tr").forEach((row, index) => {
-        row.querySelector("td:first-child").textContent = index + 1;
+    const rows = document.querySelectorAll("#productTableBody tr:not(#emptyRow)"); // Bỏ qua dòng trống
+    rows.forEach((row, index) => {
+        const cell = row.querySelector("td:first-child");
+        if (cell) cell.textContent = index + 1; // Cập nhật số thứ tự
     });
+    toggleEmptyRow();
 }
 
 // Gợi ý sản phẩm khi nhập
@@ -594,7 +818,6 @@ function validateForm(event) {
 }
 
 document.querySelector("form").addEventListener("submit", validateForm);
-
 
 </script>
 

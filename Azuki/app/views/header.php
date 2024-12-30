@@ -295,29 +295,53 @@
 
 
 
-            <a href= "/azuki/trangchu/baohanh" style="text-decoration: none; color: inherit;">
-            <li 
+          
+            <li class="dropdown <?php if ($trang == 'baohanh' || $trang =='danhsachdoitra' ) echo 'open'; ?>">
+                <a href="#" onclick="toggleDropdown(event)" style="text-decoration: none; color: inherit;">
+                <i class="fa fa-bullhorn"></i> Bảo hành
+                    <i class="fa fa-caret-right dropdown-icon"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    
+                    <a href= "/azuki/trangchu/baohanh" style="text-decoration: none; color: inherit;">
+                    <li 
             <?php if($trang=="baohanh"){?>
             style=" background-color: #4C9AED;"
             <?php } ?>>
-                <i class="fa fa-bullhorn"></i> Bảo hành
+                 Danh sách bảo hành
             </li>
             </a>
+                    <a href= "/azuki/trangchu/danhsachdoitra" style="text-decoration: none; color: inherit;">
+                    <li
+                    <?php if( $trang=="danhsachdoitra" ){?>
+            style=" background-color: #4C9AED;"
+            <?php } ?>>Đổi trả</li></a>                  
+                </ul>
+            </li>
 
             
-            <li class="dropdown <?php if ($trang == 'baocaodoanhthu' ) echo 'open'; ?>">
+            <li class="dropdown <?php if ($trang == 'baocaobanhang' || $trang =='baocaotaichinh' || $trang =='baocaobaohanh' ) echo 'open'; ?>">
                 <a href="#" onclick="toggleDropdown(event)" style="text-decoration: none; color: inherit;">
                     <i class="fa fa-box"></i> Báo cáo
                     <i class="fa fa-caret-right dropdown-icon"></i>
                 </a>
                 <ul class="dropdown-menu">
                     
-                    <a href= "/azuki/trangchu/baocaodoanhthu" style="text-decoration: none; color: inherit;">
+                    <a href= "/azuki/trangchu/baocaobanhang" style="text-decoration: none; color: inherit;">
                     <li
-                    <?php if($trang=="baocaodoanhthu" ){?>
+                    <?php if($trang=="baocaobanhang" ){?>
             style=" background-color: #4C9AED;"
-            <?php } ?>>Báo cáo doanh thu</li></a>
-
+            <?php } ?>>Báo cáo bán hàng</li></a>
+            <a href= "/azuki/trangchu/baocaotaichinh" style="text-decoration: none; color: inherit;">
+                    <li
+                    <?php if($trang=="baocaotaichinh" ){?>
+            style=" background-color: #4C9AED;"
+            <?php } ?>>Báo cáo tài chính</li></a>
+            <a href= "/azuki/trangchu/baocaobaohanh" style="text-decoration: none; color: inherit;">
+                    <li
+                    <?php if($trang=="baocaobaohanh" ){?>
+            style=" background-color: #4C9AED;"
+            <?php } ?>>Báo cáo bảo hành</li></a>
                   
                 </ul>
             </li>

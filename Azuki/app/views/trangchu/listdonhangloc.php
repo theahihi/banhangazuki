@@ -5,6 +5,7 @@
       <thead>
         <tr>
           <th >STT</th>
+          <th>Số hoá đơn</th>
           <th >Tên khách hàng nhận</th>
           <th >Số  điện thoại</th>
           <th >Email</th>
@@ -25,6 +26,7 @@
     
   <tr>
     <td><?php echo $i ?></td>
+    <td><?php echo $row['mahd'] ?></td>
     <td><?php echo $row['hoten'] ?></td>
     <td><?php echo $row['sodienthoai'] ?></td>
     <td><?php echo $row['email'] ?></td>
@@ -36,15 +38,9 @@
     <td>
     <button onclick="openPopup('<?php echo $row['mahd']; ?>')"
     style="background-color: #16A085; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">
-    Chi tiết
+    <i class="fa fa-eye"></i>
 </button>
-<a href="/azuki/trangchu/doitra/<?php echo $row['mahd']?>">
-    <button 
-        style="background-color:rgb(29, 51, 198); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">
-        <i class="fa-solid fa-sync-alt"></i>
-    
-    </button>
-</a>
+
  </td> 
   </tr>
 

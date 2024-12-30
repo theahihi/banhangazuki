@@ -1,29 +1,73 @@
-<div class="content" style="margin-left: 250px; padding: 20px;">
+
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Báo Cáo Tài Chính</title>
+        <title>Báo Cáo Bán Hàng</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
-  
-
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
+/* Giới hạn chiều rộng của toàn bộ nội dung */
+.content {
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 1200px; /* Đặt giới hạn chiều rộng */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+/* Kích thước biểu đồ */
+#revenueByProductChart, #monthlyRevenueChart, #productPieChart, #ordersByCustomerChart {
+    width: 100%;
+    max-width: 600px; /* Giới hạn chiều rộng của biểu đồ */
+    height: 300px; /* Đặt chiều cao cố định */
+}
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Tránh tràn ngang */
 }
 
+/* Wrapper tổng thể */
+.wrapper {
+    max-width: 1200px; /* Giới hạn chiều rộng */
+    margin: 0 auto; /* Căn giữa nội dung */
+    padding: 0 20px; /* Thêm khoảng cách hai bên */
+}
+
+
+
+
+/* Tiêu đề báo cáo cố định */
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 2em;
+    margin: 0;
+    padding: 15px 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    top: 60px; /* Đặt dưới header */
+    z-index: 900; /* Dưới header nhưng trên nội dung */
+    width: 100%; /* Đảm bảo chiều ngang chiếm toàn bộ khung chứa */
+    max-width: 1200px; /* Đồng bộ với phần body */
+    left: 63%; /* Căn giữa */
+    transform: translateX(-50%); /* Căn giữa hoàn hảo */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hiệu ứng nổi nhẹ */
+}
+/* Wrapper cho các biểu đồ */
 .chart-wrapper {
     display: grid;
     grid-template-areas:
         "revenueByProduct revenueByProduct"
         "monthlyRevenueChart monthlyRevenueChart"
         "productPieChart ordersByCustomerChart";
-    grid-template-rows: auto; /* Chiều cao tự động */
-    gap: 20px; /* Khoảng cách giữa các biểu đồ */
-    height: 90vh; /* Chiếm 90% chiều cao màn hình */
+    grid-template-rows: auto;
+    gap: 20px;
+    margin: 20px 0;
 }
 
 .chart-container {
@@ -33,7 +77,7 @@ h1 {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
 }
 
 /* Biểu đồ doanh thu theo sản phẩm chiếm lớn nhất */
@@ -60,13 +104,13 @@ h1 {
     height: 200px;
 }
 
-
 </style>
 
     </head>
     <body>
+    <div class="content" style="margin-left: 250px; padding: 20px;">
        <div class="container">
-    <h1>Báo Cáo Doanh Thu</h1>
+    <h1>Báo Cáo Bán Hàng</h1>
     <div class="chart-wrapper">
     <div class="chart-container line-chart">
             <h3>Doanh Thu Theo Sản Phẩm</h3>
@@ -93,7 +137,6 @@ h1 {
         <!-- Biểu đồ 4: Doanh thu theo sản phẩm -->
         
     </div>
-
 
 
         <script>
@@ -197,3 +240,4 @@ h1 {
     </body>
     </html>
 </div>
+

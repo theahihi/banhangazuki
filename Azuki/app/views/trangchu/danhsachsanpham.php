@@ -938,14 +938,103 @@ button#addsp i:hover {
 
 </body>
 </html>
+
+
 <?php 
 if (isset($_SESSION['thanhcong'])) {
-    echo "<script>
-            window.onload = function() {
-              alert('" . $_SESSION['thanhcong'] . "');
-            }
+  ?>
+<style>
+    /* Nền tối của popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Ẩn popup mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung chính của popup */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 2px solid #6a0dad; /* Đường viền tím */
+}
+
+/* Biểu tượng thành công */
+.popup-content i {
+    font-size: 50px;
+    color: #28a745; /* Màu xanh lá cây */
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề của popup */
+.popup-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00cc00; /* Màu xanh lá cây */
+    margin: 10px 0;
+}
+
+/* Nội dung thông báo */
+.popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Nút đóng popup */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000; /* Màu đỏ */
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: #000;
+}
+</style>
+  <?php
+    echo "<div id='popup' class='popup'>
+            <div class='popup-content'>
+              <span class='close'>&times;</span>
+              <i class='fa fa-check-circle'></i>
+              <h3>THÔNG BÁO</h3>
+              <p>" . $_SESSION['thanhcong'] . "</p>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.popup .close');
+                
+                // Hiển thị popup khi trang tải xong
+                popup.style.display = 'flex';
+
+                // Đóng popup khi nhấn nút close
+                closeBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                });
+
+                // Tự động đóng popup sau 5 giây
+                setTimeout(function () {
+                    popup.style.display = 'none';
+                }, 5000);
+            });
           </script>";
     unset($_SESSION['thanhcong']);
-  }
-
-?> 
+}
+?>

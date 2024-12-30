@@ -250,7 +250,6 @@
         border: 1px solid #ddd;
         border-radius: 6px;
         overflow: hidden;
-        width: 100%;
     }
 
     .table-header {
@@ -267,8 +266,8 @@
 
     .table-cell {
         flex: 1;
-        padding: 8px; /* Giảm padding để tối ưu chữ nhỏ */
-        text-align: left;
+        padding: 2px; /* Giảm padding để tối ưu chữ nhỏ */
+        text-align: center;
         border-right: 1px solid #ddd;
         font-size: 12px; /* Giảm kích thước chữ */
     }
@@ -358,21 +357,36 @@
     background: #2980b9;
 }
 
+<style>
+  /* Giảm kích thước các cột "Đơn giá" và "Số lượng" */
+  .table-cell.price, 
+  .table-cell.quantity {
+      width: 100px; /* Đặt chiều rộng cụ thể cho cột */
+      text-align: center; /* Căn giữa nội dung */
+      font-size: 12px; /* Giảm kích thước chữ */
+      padding: 5px; /* Giảm padding để nhỏ gọn */
+  }
+
+  /* Giảm kích thước ảnh trong cột sản phẩm */
+  .table-cell img {
+      max-width: 60px; /* Giảm kích thước ảnh */
+      max-height: 60px;
+      margin-left: 10px;
+  }
+</style>
+
+
 </style>
 
 
 <div class="content" style="margin-left: 250px; padding: 20px;">
 <div class="main-content">
     <div  class="tab-content active "> 
-    <form id="filterForm" style="margin-bottom: 20px;">
+    <form id="filterForm" style="margin-bottom: 20px;" onsubmit="return false;">
     <div style="display: flex; gap: 15px; align-items: center;">
         <div>
-            <label for="khachhang">Khách hàng:</label>
-            <input style="width:155px" type="text" id="khachhang" name="khachhang" placeholder="Nhập tên khách hàng">
-        </div>
-        <div>
-            <label for="madonhang">Số điện thoại:</label>
-            <input type="tel" id="sdt" name="sdt" placeholder="Nhập số điện thoại" oninput="validatePhoneNumber(this)">
+            <label for="khachhang">Nhập thông tin tìm kiếm:</label>
+            <input style="width:215px" type="text" id="khachhang" name="noidung" placeholder="Tên khách hàng/SĐT/Số hoá đơn">
         </div>
         <div>
             <label for="madonhang">Từ:</label>
@@ -382,11 +396,7 @@
             <label for="madonhang">Đến:</label>
             <input type="date" id="denngay" name="denngay">
         </div>
-        <div>
-            <button type="button" id="filterButton" style="background-color: #3498DB; color: white; border: none; border-radius: 6px; padding: 8px 15px; cursor: pointer;">
-                Lọc
-            </button>
-        </div>
+        
     </div>
 </form>
       <a href="/azuki/trangchu/listdonhang" style="text-decoration: none;">
@@ -402,9 +412,9 @@
       <thead>
         <tr>
           <th >STT</th>
+          <th>Số hoá đơn</th>
           <th >Tên khách hàng nhận</th>
           <th >Số  điện thoại</th>
-          <th >Email</th>
           <th>Ghi chú</th>
           <th>Tổng tiền</th>
           <th>Phương thức</th>
@@ -421,9 +431,9 @@
     ?>
   <tr>
     <td><?php echo $i ?></td>
+    <td><?php echo $row['mahd'] ?></td>
     <td><?php echo $row['hoten'] ?></td>
     <td><?php echo $row['sodienthoai'] ?></td>
-    <td><?php echo $row['email'] ?></td>
     <td><?php if($row['ghichu']==''){echo "không có" ;}else{echo $row['ghichu'] ; }  ?></td>
     <td><?php echo number_format($row['tongtien'], 0, '', ','); ?>₫</td>
     <td><?php echo $row['phuongthuc'] ?></td>
@@ -432,14 +442,9 @@
     <td>
     <button onclick="openPopup('<?php echo $row['mahd']; ?>')"
     style="background-color: #16A085; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">
-    Chi tiết
+    <i class="fa fa-eye"></i>
 </button>
-<a href="/azuki/trangchu/doitra/<?php echo $row['mahd']?>">
-    <button 
-        style="background-color:rgb(29, 51, 198); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">
-        <i class="fa-solid fa-sync-alt"></i>
-    
-    </button>
+
 </a>
  </td> 
   </tr>
@@ -452,8 +457,8 @@
         <div class="table">
     <div class="table-header">
         <div class="table-cell">Sản phẩm</div>
-        <div class="table-cell">Đơn giá</div>
-        <div class="table-cell">Số lượng</div>
+        <div class="table-cell price" >Đơn giá</div>
+        <div class="table-cell quantity ">Số lượng</div>
     </div>
     <?php while($rowctsp=mysqLi_fetch_array($chitietsanphammua)) {?>
 
@@ -463,8 +468,8 @@
           <?php echo $rowctsp['tensp'] ?>
           <img  style=" width: 80px; height: 80px;"src="<?php echo WEBROOT . 'public/client/Picture/anhsanpham/' . $rowctsp['anhhienthi1']; ?>" alt="">
       </div>
-        <div class="table-cell"><?php echo number_format($rowctsp['dongia'], 0, '', ','); ?>₫</div>
-        <div class="table-cell"><?php echo $rowctsp['soluong'] ?></div>
+        <div class="table-cell price "><?php echo number_format($rowctsp['dongia'], 0, '', ','); ?>₫</div>
+        <div class="table-cell quantity "><?php echo $rowctsp['soluong'] ?></div>
 
     </div>
     <?php }}?>
@@ -521,7 +526,9 @@ function openPopup(mahd) {
   }
 
 
-  document.getElementById('filterButton').addEventListener('click', function () {
+  document.getElementById('filterForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Ngăn chặn hành động mặc định của form
+
     // Thu thập dữ liệu từ form
     const formData = new FormData(document.getElementById('filterForm'));
 
@@ -536,6 +543,23 @@ function openPopup(mahd) {
         })
         .catch(error => console.error('Error:', error));
 });
+
+// Lắng nghe sự kiện nhấn Enter từ các trường đầu vào
+document.querySelectorAll('#filterForm input').forEach(input => {
+    input.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') { // Kiểm tra nếu nhấn phím Enter
+            event.preventDefault(); // Ngăn chặn hành vi mặc định
+            document.getElementById('filterForm').dispatchEvent(new Event('submit')); // Gửi form
+        }
+    });
+});
+
+// Nút lọc vẫn hoạt động nếu cần
+document.getElementById('filterButton').addEventListener('click', function () {
+    document.getElementById('filterForm').dispatchEvent(new Event('submit'));
+});
+
+
 
 
 

@@ -12,7 +12,7 @@ class trangchuModel extends Model {
     protected $tablectdondathang = 'chitietdonhang';
     protected $tabletk='taikhoan';
     protected $tablekh='khachhang';
-
+    protected $tablebh='baohanh';
     public function dondathang(){
         $sql = "SELECT * FROM $this->tabledondathang WHERE active=1  ORDER BY mahd DESC ";
         $result=$this->con->query($sql);
@@ -193,23 +193,11 @@ public function giamsl($soluong,$masp){
     return $result;
   }
 
-  public function dondathang_loc($serinumber,$hoten, $sdt, $tungay, $denngay) {
-    $sql = "SELECT * 
-            FROM dondathang 
-            WHERE active = 1";
+  public function dondathang_loc($noidung, $tungay, $denngay) {
+    $sql = "SELECT * FROM dondathang WHERE active = 1";
 
-    if (!empty($hoten)) {
-        $sql .= " AND hoten LIKE '%$hoten%'";
-    }
-    if (!empty($serinumber)) {
-        $sql .= " AND mahd = (SELECT $this->tabledondathang.mahd FROM $this->tabledondathang INNER JOIN $this->tablectdondathang ON 
-         $this->tabledondathang.mahd=$this->tablectdondathang.mahd WHERE serinumber='$serinumber'
-          )
-        ";
-    }
-
-    if (!empty($sdt)) {
-        $sql .= " AND sodienthoai LIKE '%$sdt%'";
+    if (!empty($noidung)) {
+        $sql .= " AND (mahd = '$noidung' OR sodienthoai LIKE '%$noidung%' OR hoten LIKE '%$noidung%' )";
     }
 
     if (!empty($tungay) && !empty($denngay)) {
@@ -220,13 +208,12 @@ public function giamsl($soluong,$masp){
         $sql .= " AND ngaydat <= '$denngay 23:59:59'";
     }
 
-    $sql .= " ORDER BY mahd DESC
-    ";
+    $sql .= " ORDER BY mahd DESC";
 
     $result = $this->con->query($sql);
     return $result;
 }
-public function danhsachkhachhang_loc($hoten , $sdt ) {
+public function danhsachkhachhang_loc( $noidung ) {
     $sql = "SELECT 
                 $this->tablekh.*, 
                 SUM(tongtien) as tongtienmua, 
@@ -237,13 +224,13 @@ public function danhsachkhachhang_loc($hoten , $sdt ) {
 
     $conditions = [];
 
-    if (!empty($hoten)) {
-        $conditions[] = "$this->tablekh.hoten LIKE '%$hoten%'";
+    if (!empty($noidung)) {
+        $conditions[] = "$this->tablekh.hoten LIKE '%$noidung%' OR $this->tablekh.sodienthoai LIKE '%$noidung%' ";
     }
 
-    if (!empty($sdt)) {
+  /*  if (!empty($sdt)) {
         $conditions[] = "$this->tablekh.sodienthoai LIKE '%$sdt%'";
-    }
+    } */
 
     if (!empty($conditions)) {
         $sql .= "WHERE " . implode(" AND ", $conditions) . " ";
@@ -267,20 +254,20 @@ public function doanhthu(){
 
 
 
-    public function getAllWarranties() {
-        $sql = "SELECT * FROM baohanh ORDER BY mabaohanh DESC";
-        $stmt = $this->con->prepare($sql);
-        $stmt->execute();
-        return $stmt->get_result();
-    }
 
-    public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $serinumber, $loimota, $trangthai) {
-        $sql = "INSERT INTO baohanh (mabaohanh, ngaybaohanh, ngaytra, serinumber, loimota, trangthai) 
-                VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $this->con->prepare($sql);
-        $stmt->bind_param("ssssss", $mabaohanh, $ngaybaohanh, $ngaytra, $serinumber, $loimota, $trangthai);
-        $stmt->execute();
-    }
+
+public function getAllWarranties() {
+    $sql = "SELECT bh.*, sp.tensp FROM baohanh bh 
+            LEFT JOIN sanpham sp ON bh.masp = sp.masp 
+            ORDER BY bh.mabaohanh DESC";
+    return $this->con->query($sql);
+}
+
+public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota, $trangthai) {
+    $sql = "INSERT INTO baohanh (mabaohanh, ngaybaohanh, ngaytra, masp, loimota, trangthai) 
+            VALUES ('$mabaohanh', '$ngaybaohanh', '$ngaytra', '$masp', '$loimota', '$trangthai')";
+    return $this->con->query($sql);
+}
 
     // public function deleteWarranty($mabaohanh) {
     //     try {
@@ -317,13 +304,27 @@ public function doanhthu(){
 
         return 'BH' . str_pad($nextCode, 3, '0', STR_PAD_LEFT);
     }
-
-    public function updateWarranty($mabaohanh, $ngaytra, $serinumber, $loimota, $trangthai) {
-        $sql = "UPDATE baohanh SET ngaytra = ?, serinumber = ?, loimota = ?, trangthai = ? WHERE mabaohanh = ?";
-        $stmt = $this->con->prepare($sql);
-        $stmt->bind_param("sssss", $ngaytra, $serinumber, $loimota, $trangthai, $mabaohanh);
-        $stmt->execute();
+/// baohanh
+    public function updateWarranty($mabaohanh, $ngaytra, $masp, $loimota, $trangthai) {
+        $sql = "UPDATE baohanh SET ngaytra = '$ngaytra', masp = '$masp', loimota = '$loimota', trangthai = '$trangthai' 
+                WHERE mabaohanh = '$mabaohanh'";
+        return $this->con->query($sql);
     }
+    public function getInvoiceDetails($mahd) {
+        $sql = "SELECT ngaydat FROM dondathang WHERE mahd = '$mahd'";
+        $result = $this->con->query($sql);
+        if (!$result) {
+            error_log("SQL Error: " . $this->con->error); // Ghi log lỗi SQL
+        }
+        return $result;
+    }
+    public function getInvoiceProducts($mahd) {
+        $sql = "SELECT sp.masp, sp.tensp FROM chitietdonhang ctd 
+                INNER JOIN sanpham sp ON ctd.masp = sp.masp 
+                WHERE ctd.mahd = '$mahd'";
+        return $this->con->query($sql);
+    }
+// baohanh
 ///hihi
     public function chitietdonhangmua($mahd){
         $sql = "SELECT $this->tablectdondathang.*,$this->table3.tensp,$this->table3.dongia,$this->table3.anhhienthi1 FROM $this->tablectdondathang INNER JOIN $this->table3 ON $this->tablectdondathang.masp=$this->table3.masp
@@ -425,8 +426,86 @@ public function doanhthu(){
 
 
 // hihi
+//haha
+public function editkhachhang($hoten,$sodienthoai,$email,$id) {
+    $sql = "UPDATE $this->tablekh SET hoten='$hoten', sodienthoai='$sodienthoai',
+    email='$email' WHERE id=$id
+     ";
+$result = $this->con->query($sql);
+return $result;
+
+}
 
 
+
+//haha
+public function baohanhTrongThang($thang = null, $nam = null) {
+    $where = "";
+    if ($thang && $nam) {
+        $where = "WHERE MONTH(dh.ngaydat) = $thang AND YEAR(dh.ngaydat) = $nam";
+    }
+    $sql = "
+        SELECT 
+            YEAR(dh.ngaydat) AS nam, 
+            MONTH(dh.ngaydat) AS thang, 
+            COUNT(bh.mabaohanh) AS tong_so_bao_hanh,
+            COUNT(DISTINCT dh.mahd) AS tong_so_don_hang
+        FROM dondathang AS dh
+        LEFT JOIN chitietdonhang AS ctdh ON dh.mahd = ctdh.mahd
+        LEFT JOIN baohanh AS bh ON ctdh.masp = bh.masp
+        $where
+        GROUP BY YEAR(dh.ngaydat), MONTH(dh.ngaydat)
+        ORDER BY nam ASC, thang ASC
+    ";
+    return $this->con->query($sql);
+}
+
+public function sanphamBaoHanhNhieuNhat($thang = null, $nam = null) {
+    $where = "";
+    if ($thang && $nam) {
+        $where = "WHERE MONTH(bh.ngaybaohanh) = $thang AND YEAR(bh.ngaybaohanh) = $nam";
+    }
+    $sql = "
+        SELECT 
+            YEAR(bh.ngaybaohanh) AS nam, 
+            MONTH(bh.ngaybaohanh) AS thang, 
+            sp.masp, 
+            COUNT(bh.mabaohanh) AS tong_so_bao_hanh
+        FROM baohanh AS bh
+        INNER JOIN sanpham AS sp ON bh.masp = sp.masp
+        $where
+        GROUP BY YEAR(bh.ngaybaohanh), MONTH(bh.ngaybaohanh), sp.masp
+        ORDER BY tong_so_bao_hanh DESC
+        LIMIT 1
+    ";
+    return $this->con->query($sql);
+}
+
+
+
+//huhu
+
+public function sanphamdoitra($mahd){
+    $sql = "
+    SELECT $this->tablectdondathang.*,$this->table3.tensp FROM $this->tablectdondathang INNER JOIN $this->table3 ON
+    $this->tablectdondathang.masp=$this->table3.masp 
+    "
+    ;
+    if(isset($mahd)){
+        $sql.="WHERE mahd='$mahd' " ;
+    }else{
+        $sql.="WHERE mahd=' '";
+    }
+
+    $result = $this->con->query($sql);
+    return $result; 
+}
+
+
+
+
+
+//huhu
 
 
 
