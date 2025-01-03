@@ -13,8 +13,11 @@ class trangchuModel extends Model {
     protected $tabletk='taikhoan';
     protected $tablekh='khachhang';
     protected $tablebh='baohanh';
+    protected $tabledoitra='doitra';
+    protected $tablechitietdoitra='chitietdoitra';
+
     public function dondathang(){
-        $sql = "SELECT * FROM $this->tabledondathang WHERE active=1  ORDER BY mahd DESC ";
+        $sql = "SELECT * FROM $this->tabledondathang   ORDER BY mahd DESC ";
         $result=$this->con->query($sql);
         return $result;
     } 
@@ -59,7 +62,7 @@ class trangchuModel extends Model {
     public function Getsoluongdaban(){
         $sql = "SELECT SUM(soluong) AS soluongban,masp FROM $this->tablectdondathang 
         INNER JOIN $this->tabledondathang ON $this->tablectdondathang.mahd =$this->tabledondathang.mahd
-        WHERE active= 1  GROUP BY masp
+         GROUP BY masp
            ";
         $result=$this->con->query($sql);
         return $result;
@@ -102,9 +105,9 @@ public function insertsanpham($tensp, $anh_main,$thongtinsp, $maloai, $masp,$don
     return $result;
 }
 
-public function themdonhang($hoten,$sodienthoai,$email,$facebook,$ghichu,$tongtien,$phuongthuc) {
-    $sql = "INSERT INTO $this->tabledondathang(hoten,sodienthoai,email,facebook,ghichu,tongtien,phuongthuc,ngaydat) 
-            VALUES('$hoten','$sodienthoai','$email','$facebook','$ghichu',$tongtien,'$phuongthuc',NOW()) ";
+public function themdonhang($hoten,$sodienthoai,$ghichu,$tongtien,$phuongthuc) {
+    $sql = "INSERT INTO $this->tabledondathang(hoten,sodienthoai,ghichu,tongtien,phuongthuc,ngaydat) 
+            VALUES('$hoten','$sodienthoai','$ghichu',$tongtien,'$phuongthuc',NOW()) ";
     $result = $this->con->query($sql);
     return $result;
 }
@@ -122,9 +125,9 @@ public function themchitiethd($mahd,$masp,$soluong,$dongia) {
 }
 
 
-public function themkhachhang($hoten,$sodienthoai,$email,$facebook) {
-    $sql = "INSERT INTO $this->tablekh(hoten,sodienthoai,email,facebook) 
-            VALUES('$hoten','$sodienthoai','$email','$facebook') ";
+public function themkhachhang($hoten,$sodienthoai) {
+    $sql = "INSERT INTO $this->tablekh(hoten,sodienthoai) 
+            VALUES('$hoten','$sodienthoai') ";
     $result = $this->con->query($sql);
     return $result;
 }
@@ -161,8 +164,8 @@ public function getDoanhThuNgay($month = null) {
     $sql = "SELECT 
                 DATE(ngaydat) AS ngay,
                 SUM(tongtien) AS doanhthu
-            FROM $this->tabledondathang
-            WHERE active = 1";
+            FROM $this->tabledondathang WHERE mahd !='' 
+            ";
 
     if ($month) {
         $sql .= " AND DATE_FORMAT(ngaydat, '%Y-%m') = ?"; // Filter by month
@@ -194,7 +197,7 @@ public function giamsl($soluong,$masp){
   }
 
   public function dondathang_loc($noidung, $tungay, $denngay) {
-    $sql = "SELECT * FROM dondathang WHERE active = 1";
+    $sql = "SELECT * FROM dondathang WHERE mahd != ''";
 
     if (!empty($noidung)) {
         $sql .= " AND (mahd = '$noidung' OR sodienthoai LIKE '%$noidung%' OR hoten LIKE '%$noidung%' )";
@@ -246,7 +249,6 @@ public function danhsachkhachhang_loc( $noidung ) {
 public function doanhthu(){
     $sql = "SELECT  SUM($this->tablectdondathang.soluong * $this->tablectdondathang.dongia) OVER () AS tong_giatri  FROM $this->tablectdondathang INNER JOIN $this->tabledondathang ON 
     $this->tablectdondathang.mahd=$this->tabledondathang.mahd
-    WHERE $this->tabledondathang.active=1 AND  $this->tabledondathang.trangthai !=2 
       ";
     $result=$this->con->query($sql);
     return $result;
@@ -335,7 +337,7 @@ public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota,
     }
 
     public function thongtinkh($mahd){
-        $sql = "SELECT * FROM $this->tabledondathang WHERE active=1 AND mahd=$mahd ";
+        $sql = "SELECT * FROM $this->tabledondathang WHERE  mahd=$mahd ";
         $result=$this->con->query($sql);
         return $result;
     }
@@ -383,7 +385,7 @@ public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota,
     }
     public function doanhthutheothang() {
         $sql = "SELECT YEAR(ngaydat) AS nam,MONTH(ngaydat) AS thang,SUM(tongtien) AS doanhthu FROM $this->tabledondathang
-            WHERE active = 1  GROUP BY YEAR(ngaydat), MONTH(ngaydat) ORDER BY nam ASC, thang ASC
+              GROUP BY YEAR(ngaydat), MONTH(ngaydat) ORDER BY nam ASC, thang ASC
         ";
         $result = $this->con->query($sql);
         return $result;
@@ -403,7 +405,7 @@ public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota,
                     COUNT(DISTINCT ct.mahd) AS so_don_hang, 
                     SUM(ct.tongtien) AS tong_doanh_thu
                 FROM $this->tabledondathang AS ct
-                WHERE ct.active = 1
+               
                 GROUP BY ct.hoten, ct.sodienthoai
                 ORDER BY tong_doanh_thu DESC";
         $result = $this->con->query($sql);
@@ -427,9 +429,9 @@ public function addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota,
 
 // hihi
 //haha
-public function editkhachhang($hoten,$sodienthoai,$email,$id) {
-    $sql = "UPDATE $this->tablekh SET hoten='$hoten', sodienthoai='$sodienthoai',
-    email='$email' WHERE id=$id
+public function editkhachhang($hoten,$sodienthoai,$id) {
+    $sql = "UPDATE $this->tablekh SET hoten='$hoten', sodienthoai='$sodienthoai'
+     WHERE id=$id
      ";
 $result = $this->con->query($sql);
 return $result;
@@ -501,19 +503,92 @@ public function sanphamdoitra($mahd){
     return $result; 
 }
 
+public function checkdoitra($mahd) {
+    $sql = "
+    SELECT DATEDIFF(NOW(), ngaydat) AS so_ngay FROM $this->tabledondathang 
+ 
+    ";
+    if(isset($mahd)){
+        $sql.="WHERE mahd='$mahd' " ;
+    }
+ 
+    $result = $this->con->query($sql);
+    return $result;
+}
 
+public function themdondoitra($mahd){
+    $sql="INSERT INTO $this->tabledoitra(mahd,ngaydoitra) VALUES($mahd,NOW()) ";
+    $result = $this->con->query($sql);
+    return $result;
+}
 
+public function maxmadt() {
+    $sql = "SELECT MAX(madt) AS max FROM $this->tabledoitra";
+    $result=$this->con->query($sql);
+    return $result;
+}
+public function themctdondoitra($madt,$masp,$soluong){
+    $sql="INSERT INTO $this->tablechitietdoitra VALUES($madt,'$masp',$soluong) ";
+    $result = $this->con->query($sql);
+    return $result;
+}
 
+public function getlistdoitra() {
+    $sql = "SELECT*FROM $this->tabledoitra INNER JOIN $this->tabledondathang 
+    ON $this->tabledoitra.mahd=$this->tabledondathang.mahd
+     ORDER BY madt DESC
+     ";
+$result = $this->con->query($sql);
+return $result;
+
+}
+
+public function getchitietdoitra() {
+    $sql = "SELECT $this->tablechitietdoitra.*,$this->table3.tensp,$this->table3.dongia,$this->table3.anhhienthi1 FROM $this->tablechitietdoitra INNER JOIN $this->table3
+    ON $this->tablechitietdoitra.masp=$this->table3.masp
+     ";
+$result = $this->con->query($sql);
+return $result;
+
+}
+
+public function listdoitra_loc($noidung, $tungay, $denngay) {
+    $sql = "SELECT * FROM $this->tabledoitra INNER JOIN $this->tabledondathang 
+    ON $this->tabledoitra.mahd=$this->tabledondathang.mahd WHERE madt != ''";
+
+    if (!empty($noidung)) {
+        $sql .= " AND ($this->tabledoitra.mahd = '$noidung' OR sodienthoai LIKE '%$noidung%' OR hoten LIKE '%$noidung%' OR madt='$noidung' )";
+    }
+
+    if (!empty($tungay) && !empty($denngay)) {
+        $sql .= " AND ngaydoitra BETWEEN '$tungay 00:00:00' AND '$denngay 23:59:59'";
+    } elseif (!empty($tungay)) {
+        $sql .= " AND ngaydoitra >= '$tungay 00:00:00'";
+    } elseif (!empty($denngay)) {
+        $sql .= " AND ngaydoitra <= '$denngay 23:59:59'";
+    }
+
+    $sql .= " ORDER BY madt DESC";
+    $result = $this->con->query($sql);
+    return $result;
+}
 
 //huhu
 
 
+//in đơn hàng
 
 
+public function getallctdh(){
+    $sql="SELECT $this->tablectdondathang.*,$this->table3.tensp 
+    FROM $this->tablectdondathang INNER JOIN $this->table3 ON 
+    $this->tablectdondathang.masp=$this->table3.masp
+    ";
+    $result=$this->con->query($sql);
+    return $result;
+}
 
-
-
-
+//
 
 
 

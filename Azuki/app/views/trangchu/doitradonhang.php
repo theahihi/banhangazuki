@@ -308,6 +308,7 @@ body {
 
 <script>
 let productArray = []; // Mảng lưu sản phẩm thay thế
+let orderProductsArray = []; // Mảng lưu sản phẩm khách hàng trả
 
 // Hiển thị kết quả tìm kiếm sản phẩm thay thế
 document.getElementById("searchInput").addEventListener("keyup", function () {
@@ -352,8 +353,15 @@ document.getElementById("searchResults").addEventListener("click", function (eve
         const productName = target.dataset.productName;
         const productPrice = target.dataset.productPrice;
 
+        // Kiểm tra nếu sản phẩm thay thế trùng với sản phẩm trả
+        const matchedProduct = orderProductsArray.find((item) => item.productId === productId);
+        if (!matchedProduct) {
+            alert("Sản phẩm thay thế không khớp với sản phẩm khách hàng trả.");
+            return;
+        }
+
         // Thêm sản phẩm vào bảng và mảng
-        addProductToTable(productId, productName, productPrice);
+        addProductToTable(productId, productName, productPrice, matchedProduct.quantity);
 
         // Ẩn thanh gợi ý và xóa nội dung tìm kiếm
         this.style.display = "none";
@@ -362,8 +370,15 @@ document.getElementById("searchResults").addEventListener("click", function (eve
 });
 
 // Thêm sản phẩm thay thế vào bảng và mảng
-function addProductToTable(productId, productName, productPrice) {
+function addProductToTable(productId, productName, productPrice, maxQuantity) {
     const tableBody = document.getElementById("productTableBody");
+    const existingProduct = productArray.find((item) => item.productId === productId);
+
+    if (existingProduct) {
+        alert("Sản phẩm này đã được chọn làm thay thế.");
+        return;
+    }
+
     const rowCount = tableBody.rows.length + 1;
 
     // Tạo hàng mới
@@ -372,11 +387,12 @@ function addProductToTable(productId, productName, productPrice) {
         <td>${rowCount}</td>
         <td>${productName}</td>
         <td>${parseFloat(productPrice).toLocaleString()} ₫</td>
-        <td><input type="number" value="1" min="1" style="width: 60px;" class="quantity-input"></td>
-        <td class="total-price">${parseFloat(productPrice).toLocaleString()} ₫</td>
-        <td><button type="button" class="remove-btn"><i class="fa fa-trash" ></i></button></td>
+        <td><input type="number" value="${maxQuantity}" min="1" max="${maxQuantity}" style="width: 60px;" class="quantity-input" readonly></td>
+        <td class="total-price">${(maxQuantity * parseFloat(productPrice)).toLocaleString()} ₫</td>
+        <td><button type="button" class="remove-btn"><i class="fa fa-trash"></i></button></td>
     `;
 
+    newRow.dataset.productId = productId; // Đánh dấu hàng bằng ID sản phẩm
     tableBody.appendChild(newRow);
 
     // Thêm sản phẩm vào mảng
@@ -384,17 +400,24 @@ function addProductToTable(productId, productName, productPrice) {
         productId: productId,
         name: productName,
         price: parseFloat(productPrice),
-        quantity: 1
+        quantity: maxQuantity,
     });
 
     // Sự kiện thay đổi số lượng
     newRow.querySelector(".quantity-input").addEventListener("input", function () {
         const newQuantity = parseInt(this.value) || 1;
         const totalPriceCell = newRow.querySelector(".total-price");
-        totalPriceCell.textContent = (newQuantity * parseFloat(productPrice)).toLocaleString() + " ₫";
+
+        // Kiểm tra giới hạn số lượng
+        if (newQuantity > maxQuantity) {
+            this.value = maxQuantity;
+            alert(`Số lượng không được vượt quá ${maxQuantity}.`);
+        }
+
+        totalPriceCell.textContent = (this.value * parseFloat(productPrice)).toLocaleString() + " ₫";
 
         const product = productArray.find((item) => item.productId === productId);
-        if (product) product.quantity = newQuantity;
+        if (product) product.quantity = this.value;
         updateHiddenInputs();
     });
 
@@ -408,9 +431,8 @@ function addProductToTable(productId, productName, productPrice) {
     updateHiddenInputs();
 }
 
-const orderProductsArray = [];
+// Thu thập thông tin sản phẩm khách hàng trả
 const orderRows = document.querySelectorAll(".left table tbody tr");
-
 // Thu thập thông tin sản phẩm khách hàng trả
 orderRows.forEach((row) => {
     const productId = row.querySelector("input[type='number']").name.match(/\[(.*?)\]/)[1]; // Lấy mã sản phẩm
@@ -422,61 +444,65 @@ orderRows.forEach((row) => {
     orderProductsArray.push({
         productId: productId,
         name: productName,
-        price: price,
+        price: parseFloat(price.replace(/[^\d]/g, "")), // Giá thành số
         quantity: parseInt(quantityInput.value), // Giá trị ban đầu
     });
 
-    // Sự kiện thay đổi số lượng
+    // Sự kiện thay đổi số lượng trả
     quantityInput.addEventListener("input", function () {
         const newQuantity = parseInt(this.value) || 1;
         const product = orderProductsArray.find((item) => item.productId === productId);
         if (product) product.quantity = newQuantity;
 
+        // Gọi hàm đồng bộ số lượng thay thế
+        syncReplacementQuantity(productId, newQuantity);
+
         // Cập nhật giá trị input ẩn
         document.getElementById("orderProductsInput").value = JSON.stringify(orderProductsArray);
-        console.log("Sản phẩm khách hàng trả (đã cập nhật):", orderProductsArray);
     });
 });
 
-// Cập nhật input ẩn lần đầu
-document.getElementById("orderProductsInput").value = JSON.stringify(orderProductsArray);
-
-// Cập nhật hai input ẩn
-// Cập nhật hai input ẩn
-function updateHiddenInputs() {
-    document.getElementById("productDataInput").value = JSON.stringify(productArray);
-    console.log("Sản phẩm thay thế:", productArray);
-}
-
-
-
-
-// Kiểm tra và xác thực form trước khi gửi
-document.querySelector("form").addEventListener("submit", function (event) {
-    let errorMessage = "";
-
-   
-    if (productArray.length === 0) {
-        errorMessage += "Vui lòng chọn ít nhất một sản phẩm thay thế.\n";
+// Cập nhật bảng thay thế khi số lượng trả thay đổi
+function updateReplacementTable(productId, quantity) {
+    const tableBody = document.getElementById("productTableBody");
+    const row = Array.from(tableBody.rows).find((r) => r.dataset.productId === productId);
+    if (row) {
+        const quantityInput = row.querySelector(".quantity-input");
+        quantityInput.value = quantity;
+        const price = parseFloat(productArray.find((item) => item.productId === productId).price);
+        row.querySelector(".total-price").textContent = (quantity * price).toLocaleString() + " ₫";
     }
+}
+// Đồng bộ hóa số lượng sản phẩm thay thế theo số lượng trả
+function syncReplacementQuantity(productId, newQuantity) {
+    const replacementProduct = productArray.find((item) => item.productId === productId);
+    if (replacementProduct) {
+        // Cập nhật số lượng trong mảng productArray
+        replacementProduct.quantity = newQuantity;
 
-    if (errorMessage) {
-        alert(errorMessage);
-        event.preventDefault();
-    } else {
+        // Cập nhật số lượng trong bảng sản phẩm thay thế
+        const tableBody = document.getElementById("productTableBody");
+        const row = Array.from(tableBody.rows).find((r) => r.dataset.productId === productId);
+        if (row) {
+            const quantityInput = row.querySelector(".quantity-input");
+            const totalPriceCell = row.querySelector(".total-price");
+
+            // Cập nhật giá trị input và tổng giá
+            quantityInput.value = newQuantity;
+            const price = replacementProduct.price;
+            totalPriceCell.textContent = (newQuantity * price).toLocaleString() + " ₫";
+        }
+
+        // Cập nhật input ẩn
         updateHiddenInputs();
     }
-});
+}
 
-
-    function validateInput(input) {
-        const max = input.getAttribute('max'); // Lấy giá trị max từ thuộc tính
-        if (parseInt(input.value) > parseInt(max)) {
-            input.value = max; // Nếu giá trị nhập vào lớn hơn max, set lại giá trị bằng max
-        }
-    }
-
-
+// Cập nhật input ẩn
+function updateHiddenInputs() {
+    document.getElementById("productDataInput").value = JSON.stringify(productArray);
+    document.getElementById("orderProductsInput").value = JSON.stringify(orderProductsArray);
+}
 
 
 </script>

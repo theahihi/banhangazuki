@@ -55,8 +55,9 @@ class trangchuController extends Controller {
 
       public function taodon(){
         $trang="taodonhang"; 
+        $sphd=$this->trangchuModel->getallctdh();
         $this->view('header',['trang'=>$trang]);
-        $this->view('trangchu/taodon'); 
+        $this->view('trangchu/taodon',['sphd' => $sphd ]); 
  
     }
 
@@ -124,35 +125,52 @@ class trangchuController extends Controller {
 
 
 ////
-     public function baohanh() {
-        $trang = "baohanh";
-        $danhsach_baohanh = $this->trangchuModel->getAllWarranties();
+public function baohanh() {
+    $trang = "baohanh";
 
-        // Xử lý yêu cầu POST để thêm hoặc chỉnh sửa bảo hành
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-            $action = $_POST['action'];
-            $mabaohanh = $_POST['mabaohanh'];
-            $ngaybaohanh = $_POST['ngaybaohanh'] ?? date('Y-m-d');
-            $ngaytra = $_POST['ngaytra'] ?? null;
-            $masp = $_POST['masp'] ?? null;
-            $loimota = $_POST['loimota'] ?? '';
-            $trangthai = $_POST['trangthai'] ?? 'đang xử lý';
+    // Lấy dữ liệu từ form lọc
+    $search = isset($_GET['search']) ? trim($_GET['search']) : null;
 
-            if ($action === 'add') {
-                $this->trangchuModel->addWarranty($mabaohanh, $ngaybaohanh, $ngaytra, $masp, $loimota, $trangthai);
-            } elseif ($action === 'edit') {
-                $this->trangchuModel->updateWarranty($mabaohanh, $ngaytra, $masp, $loimota, $trangthai);
-            }
+    // Gọi model để lấy danh sách bảo hành theo bộ lọc
+    $danhsach_baohanh = $this->trangchuModel->getAllWarranties($search);
 
-            echo json_encode(['success' => true]);
-            exit;
+    // Xử lý yêu cầu POST để thêm hoặc chỉnh sửa bảo hành
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+        $action = $_POST['action'];
+        $mabaohanh = $_POST['mabaohanh'] ?? null;
+        $ngaybaohanh = $_POST['ngaybaohanh'] ?? date('Y-m-d');
+        $ngaytra = $_POST['ngaytra'] ?? null;
+        $masp = $_POST['masp'] ?? null;
+        $loimota = $_POST['loimota'] ?? '';
+        $trangthai = $_POST['trangthai'] ?? 'đang xử lý';
+
+        if ($action === 'add') {
+            // Tạo mã bảo hành tự động
+            $generatedCode = $this->trangchuModel->generateWarrantyCode();
+
+            $this->trangchuModel->addWarranty(
+                $generatedCode,
+                $ngaybaohanh,
+                $ngaytra,
+                $masp,
+                $loimota,
+                $trangthai
+            );
+        } elseif ($action === 'edit') {
+            $this->trangchuModel->updateWarranty($mabaohanh, $ngaytra, $masp, $loimota, $trangthai);
         }
 
-        // Load view
-        $this->view('header', ['trang' => $trang]);
-        $this->view('trangchu/baohanh', ['danhsach_baohanh' => $danhsach_baohanh]);
+        echo json_encode(['success' => true]);
+        exit;
     }
 
+    // Load view
+    $this->view('header', ['trang' => $trang]);
+    $this->view('trangchu/baohanh', [
+        'danhsach_baohanh' => $danhsach_baohanh,
+        'search' => $search
+    ]);
+}
     public function checkInvoice() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $input = json_decode(file_get_contents('php://input'), true);
@@ -217,49 +235,57 @@ class trangchuController extends Controller {
 
 
 
-    public function taodonhang() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $tongtien_raw = $_POST['tongtien']; 
-            $tongtien = intval(str_replace(',', '', $tongtien_raw));
-            $hoten=$_POST['hoten'];
-            $sodienthoai=$_POST['sdt'];
-            $email=$_POST['email'];
-            $facebook=$_POST['facebook'];
-            $phuongthuc=$_POST['phuongthuc'];
-            $ghichu=$_POST['ghichu'];
-            $this->trangchuModel->themdonhang($hoten,$sodienthoai,$email,$facebook,$ghichu,$tongtien,$phuongthuc);
-           $result= $this->trangchuModel->maxmhd();
-           $row=mysqLi_fetch_array($result);
-           $mahd = $row['max'];
-            if (isset($_POST['productData'])) {
-                $productData = json_decode($_POST['productData'], true); 
-        
-                if (is_array($productData)) {
-                    foreach ($productData as $product) {
-                        echo "Mã sản phẩm: " . htmlspecialchars($product['productId']) . "<br>";
-                        echo "Tên sản phẩm: " . htmlspecialchars($product['productName']) . "<br>";
-                        echo "Số lượng: " . htmlspecialchars($product['quantity']) . "<br>";
-                        echo "Seri number: " . htmlspecialchars($product['serinumber']) . "<br>";
-                        echo "Giá: " . htmlspecialchars($product['price']) . "<br><br>";
-                        $masp=$product['productId'];
-                        $soluong= $product['quantity'];
-                        $dongia= $product['price'];
-                        $this->trangchuModel->themchitiethd($mahd,$masp,$soluong,$dongia);
-                        $this->trangchuModel->giamsl($soluong,$masp);
+        public function taodonhang() {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $tongtien_raw = $_POST['tongtien']; 
+                $tongtien = intval(str_replace(',', '', $tongtien_raw));
+                $hoten=$_POST['hoten'];
+                $sodienthoai=$_POST['sdt'];
+                $phuongthuc=$_POST['phuongthuc'];
+                $ghichu=$_POST['ghichu'];
+                $this->trangchuModel->themdonhang($hoten,$sodienthoai,$ghichu,$tongtien,$phuongthuc);
+            $result= $this->trangchuModel->maxmhd();
+            $row=mysqLi_fetch_array($result);
+            $mahd = $row['max'];
+                if (isset($_POST['productData'])) {
+                    $productData = json_decode($_POST['productData'], true); 
+            
+                    if (is_array($productData)) {
+                        foreach ($productData as $product) {
+                            echo "Mã sản phẩm: " . htmlspecialchars($product['productId']) . "<br>";
+                            echo "Tên sản phẩm: " . htmlspecialchars($product['productName']) . "<br>";
+                            echo "Số lượng: " . htmlspecialchars($product['quantity']) . "<br>";
+                            echo "Giá: " . htmlspecialchars($product['price']) . "<br><br>";
+                            $masp=$product['productId'];
+                            $soluong= $product['quantity'];
+                            $dongia= $product['price'];
+                            $this->trangchuModel->themchitiethd($mahd,$masp,$soluong,$dongia);
+                            $this->trangchuModel->giamsl($soluong,$masp);
 
+                        }
+                    } else {
+                        echo "Không có dữ liệu sản phẩm.";
                     }
-                } else {
-                    echo "Không có dữ liệu sản phẩm.";
                 }
-            }
-            $sdt = $this->trangchuModel->checksdtkh($sodienthoai);
-            if(mysqLi_num_rows($sdt)==0){
-                $this->trangchuModel->themkhachhang($hoten,$sodienthoai,$email,$facebook);
-            }
+                $sdt = $this->trangchuModel->checksdtkh($sodienthoai);
+                if(mysqLi_num_rows($sdt)==0){
+                    $this->trangchuModel->themkhachhang($hoten,$sodienthoai);
+                }
             $_SESSION['thanhcong']="Tạo đơn thành công ";
-            header("location: /azuki/trangchu/taodon ") ; 
+            $_SESSION['print'] = [
+                'sohoadon'=> $mahd,
+                'hoten'=>$hoten,
+                'sdt'=> $sodienthoai,
+                'phuongthuc'=> $phuongthuc,
+                'ghichu'=>$ghichu,
+                'tongtien'=> $tongtien_raw
+
+            ];
+            
+                header("location: /azuki/trangchu/taodon ") ; 
+            
+            }
         }
-    }
 
     public function goiykhachhang() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sdt'])) {
@@ -272,8 +298,6 @@ class trangchuController extends Controller {
                     <div class="search-item" 
                          data-customer-sdt="' . htmlspecialchars($row['sodienthoai']) . '" 
                          data-customer-name="' . htmlspecialchars($row['hoten']) . '" 
-                         data-customer-email="' . htmlspecialchars($row['email']) . '" 
-                         data-customer-facebook="' . htmlspecialchars($row['facebook']) . '">
                         <div style="display: flex; align-items: center; margin-bottom: 10px;">
                             <span style="font-size: 12px; font-weight: bold;">' . htmlspecialchars($row['sodienthoai']) . '</span>
                         </div>
@@ -491,10 +515,9 @@ class trangchuController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hoten = $_POST['name'];
             $sodienthoai = $_POST['phone'];
-            $email = $_POST['email'];
             $id = $_POST['id'];
         
-            $this->trangchuModel->editkhachhang($hoten, $sodienthoai, $email, $id);
+            $this->trangchuModel->editkhachhang($hoten, $sodienthoai, $id);
             $_SESSION['message'] = "Sửa thông tin khách hàng thành công!";
             header('location: /azuki/trangchu/danhsachkhachhang ');
         }
@@ -518,21 +541,50 @@ class trangchuController extends Controller {
 
     }
     
+    public function listdoitra(){
+        $trang="danhsachdoitra";
+        $listdoitra=$this->trangchuModel->getlistdoitra();
+        $chitiet= $this->trangchuModel-> getchitietdoitra();
 
+        $this->view('header',['trang'=>$trang]);
+        $this->view('trangchu/listdoitra',['listdoitra'=>$listdoitra,'chitietdoitra'=>$chitiet]);
+
+    }
+     
+    public function listdoitra_loc() {
+        $tungay = isset($_POST['tungay']) ? $_POST['tungay'] : null;
+        $denngay = isset($_POST['denngay']) ? $_POST['denngay'] : null;
+        $noidung = isset($_POST['noidung']) ? $_POST['noidung'] : null;   
+        $chitiet= $this->trangchuModel-> getchitietdoitra();
+
+        // Sử dụng $this->tranghuModel đã khởi tạo
+        $listdoitra = $this->trangchuModel->listdoitra_loc($noidung, $tungay, $denngay);
+
+        // Trả về view danh sách đơn hàng
+        $this->view('trangchu/listdoitra_loc', ['listdoitra'=>$listdoitra,'chitietdoitra'=>$chitiet]);
+    }
 
 
     public function danhsachdoitra() {
         $trang="danhsachdoitra";
+        $tgbaohanh=7;
         $mahd=isset($_POST['mahd']) ? $_POST['mahd'] : null;
         $danhsachdoitra=$this->trangchuModel->sanphamdoitra($mahd);
+        $result=$this->trangchuModel->checkdoitra($mahd);
+        $checkdoitra=mysqLi_fetch_array($result);
         if(isset($_POST['mahd'])){
             if(mysqLi_num_rows($danhsachdoitra)==0){
                 $_SESSION['thongbao']="Không tồn tại mã hoá đơn :$mahd ";
+            }else if($checkdoitra['so_ngay']>7){
+                $_SESSION['thongbao']="đơn hàng số: $mahd đã mua sản phẩm được: ".$checkdoitra['so_ngay']. " ngày không thể đổi trả ";
+                $tgbaohanh=$checkdoitra['so_ngay'];
             }
+           
+
         }
        
         $this->view('header',['trang'=>$trang]);
-        $this->view('trangchu/danhsachdoitra',['danhsachdoitra' => $danhsachdoitra,'mahd'=>$mahd ]);
+        $this->view('trangchu/danhsachdoitra',['danhsachdoitra' => $danhsachdoitra,'mahd'=>$mahd,'tgbaohanh'=>$tgbaohanh ]);
     }
 
 
@@ -560,6 +612,10 @@ class trangchuController extends Controller {
         $mahd=$_POST['mahd'];
         $selectedProducts = json_decode($_POST['orderProductsData'], true);;
         $replacementProducts = json_decode($_POST['productData'], true);
+        $this->trangchuModel->themdondoitra($mahd);
+        $result=$this->trangchuModel-> maxmadt();
+        $maxmadt=mysqli_fetch_array($result);
+        $madt=$maxmadt['max'];
             foreach ($selectedProducts as $product) {
             $masp=$product['productId'];
             $result0=$this->trangchuModel->layslhanghoatrongdonhang($mahd,$masp);
@@ -579,6 +635,7 @@ class trangchuController extends Controller {
             $soluong =$product['quantity'];
             $masp=$product['productId'];
             $dongia=$product['price'];
+            $this->trangchuModel->themctdondoitra($madt,$masp,$soluong);
             $result0=$this->trangchuModel->layslhanghoatrongdonhang($mahd,$masp);
             if(mysqLi_num_rows($result0)>0){
                $soluongchon=mysqLi_fetch_array($result0);
@@ -590,10 +647,12 @@ class trangchuController extends Controller {
             }
 
         }
+
         $result2= $this->trangchuModel->tinhlaitongtien($mahd);
         $tong=mysqLi_fetch_array($result2);
         $tongtienmoi=$tong['tongtien'];
         $this->trangchuModel-> updatetongtien($mahd,$tongtienmoi);
+        $_SESSION['thanhcong']="Tạo đơn đổi trả mới thành công";
         header('location: /azuki/trangchu/danhsachdoitra'); 
     }
     

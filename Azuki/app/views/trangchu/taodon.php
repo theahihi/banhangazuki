@@ -584,6 +584,7 @@ if (isset($_SESSION['thanhcong'])) {
             document.addEventListener('DOMContentLoaded', function () {
                 const popup = document.getElementById('popup');
                 const closeBtn = document.querySelector('.popup .close');
+                let printExecuted = false; // Cờ để đảm bảo print chỉ chạy một lần
                 
                 // Hiển thị popup khi trang tải xong
                 popup.style.display = 'flex';
@@ -591,17 +592,112 @@ if (isset($_SESSION['thanhcong'])) {
                 // Đóng popup khi nhấn nút close
                 closeBtn.addEventListener('click', function () {
                     popup.style.display = 'none';
+                    if (!printExecuted) {
+                        showPrintContent(); // Hiển thị nội dung in khi đóng popup
+                        printExecuted = true; // Đánh dấu đã in
+                    }
                 });
 
                 // Tự động đóng popup sau 5 giây
                 setTimeout(function () {
                     popup.style.display = 'none';
+                    if (!printExecuted) {
+                        showPrintContent(); // Hiển thị nội dung in sau 5 giây
+                        printExecuted = true; // Đánh dấu đã in
+                    }
                 }, 5000);
             });
+
+            function showPrintContent() {
+                const printSection = document.getElementById('printSection');
+                const originalDisplayStates = [];
+
+                // Ẩn tất cả phần tử khác trừ phần cần in
+                document.body.childNodes.forEach((node) => {
+                    if (node !== printSection && node.nodeType === 1) {
+                        originalDisplayStates.push({ node, display: node.style.display });
+                        node.style.display = 'none';
+                    }
+                });
+
+                // Hiển thị phần in
+                printSection.style.display = 'block';
+
+                // Gọi hộp thoại in
+                window.print();
+
+                // Khôi phục lại hiển thị ban đầu
+                originalDisplayStates.forEach(({ node, display }) => {
+                    node.style.display = display;
+                });
+
+                // Ẩn lại phần in
+                printSection.style.display = 'none';
+            }
           </script>";
     unset($_SESSION['thanhcong']);
+    $hoadon = $_SESSION['print'];
+    ?>
+    <!-- Nội dung hiển thị cho chế độ in -->
+    <div id="printSection" style="display: none; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; width: 100%; max-width: 600px; margin: auto;">
+    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 20px;">HÓA ĐƠN BÁN HÀNG</h2>
+        <p style="margin: 5px 0;">Công ty XYZ</p>
+        <p style="margin: 5px 0;">Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM</p>
+        <p style="margin: 5px 0;">Số điện thoại: 0909 123 456</p>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <p><strong>Số hóa đơn:</strong> <?php echo $hoadon['sohoadon']; ?></p>
+        <p><strong>Họ tên khách hàng:</strong> <?php echo $hoadon['hoten']; ?></p>
+        <p><strong>Số điện thoại khách hàng:</strong> <?php echo $hoadon['sdt']; ?></p>
+        <p><strong>Phương thức thanh toán:</strong> <?php echo $hoadon['phuongthuc']; ?></p>
+        <p><strong>Ghi chú:</strong> <?php echo $hoadon['ghichu'] ? $hoadon['ghichu'] : "Không có"; ?></p>
+    </div>
+
+    <table style="border-collapse: collapse; width: 100%; text-align: left; margin-bottom: 20px;">
+        <thead>
+            <tr style="background-color: #f2f2f2; text-align: center;">
+                <th style="border: 1px solid #ddd; padding: 8px;">STT</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Tên sản phẩm</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Số lượng</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Đơn giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $i = 1;
+            while ($row = mysqli_fetch_array($sphd)) {
+                if ($row['mahd'] == $hoadon['sohoadon']) { ?>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;"><?php echo $i; ?></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><?php echo $row['tensp']; ?></td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;"><?php echo $row['soluong']; ?></td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><?php echo number_format($row['dongia'], 0, ',', '.'); ?>đ</td>
+                    </tr>
+                <?php $i++; }
+            } ?>
+        </tbody>
+    </table>
+
+    <div style="text-align: right; margin-top: 20px;">
+        <p style="font-size: 16px; font-weight: bold;">Tổng tiền thanh toán: <?php echo $hoadon['tongtien'] ?>đ</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <p>Cảm ơn quý khách đã mua hàng!</p>
+        <p style="font-size: 12px;">Hóa đơn này được tạo tự động, không cần chữ ký.</p>
+    </div>
+</div>
+
+
+    <?php 
+    unset($_SESSION['print']);
 }
 ?>
+
+
+
 
 
 

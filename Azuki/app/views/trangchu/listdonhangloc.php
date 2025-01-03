@@ -8,7 +8,6 @@
           <th>Số hoá đơn</th>
           <th >Tên khách hàng nhận</th>
           <th >Số  điện thoại</th>
-          <th >Email</th>
           <th>Ghi chú</th>
           <th>Tổng tiền</th>
           <th>Phương thức</th>
@@ -29,7 +28,6 @@
     <td><?php echo $row['mahd'] ?></td>
     <td><?php echo $row['hoten'] ?></td>
     <td><?php echo $row['sodienthoai'] ?></td>
-    <td><?php echo $row['email'] ?></td>
     <td><?php if($row['ghichu']==''){echo "không có" ;}else{echo $row['ghichu'] ; }  ?></td>
     <td><?php echo $row['tongtien'] ?></td>
     <td><?php echo $row['phuongthuc'] ?></td>

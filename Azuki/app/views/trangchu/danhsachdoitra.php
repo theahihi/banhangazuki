@@ -244,6 +244,25 @@ input[type="submit"]:active {
         padding: 10px 20px; /* Padding nhỏ hơn */
     }
 }
+.back-link {
+    display: inline-flex; /* Biểu tượng và chữ nằm ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 5px; /* Khoảng cách giữa biểu tượng và chữ */
+    color: #333; /* Màu chữ */
+    font-size: 14px; /* Kích thước chữ */
+    text-decoration: none; /* Xóa gạch chân */
+    padding: 5px 10px; /* Khoảng cách bên trong */
+    border-radius: 4px; /* Bo góc nhẹ */
+    transition: color 0.3s ease; /* Hiệu ứng màu khi hover */
+}
+
+.back-link:hover {
+    color: #007bff; /* Màu chữ khi hover */
+}
+
+.back-link i {
+    font-size: 14px; /* Kích thước biểu tượng đồng đều với chữ */
+}
 
 </style>
 
@@ -252,13 +271,17 @@ input[type="submit"]:active {
 
 
 <div class="content" style="margin-left: 250px; padding: 20px;">
+<a href="/azuki/trangchu/listdoitra" class="back-link">
+    <i class="fas fa-arrow-left"></i> Quay lại
+</a>
+
 <div class="main-content">
     <div  class="tab-content active "> 
-    <form id="filterForm" action="/azuki/trangchu/danhsachdoitra" method="post" style="margin-bottom: 20px;">
+    <form id="filterForm" action="/azuki/trangchu/danhsachdoitra" method="post" style="margin-bottom: 20px;" onsubmit="return validateForm()">
     <div style="display: flex; gap: 15px; align-items: center;">
         <div>
             <label for="madonhang">Số Hoá đơn cần đổi trả:</label>
-            <input type="tel" id="sdt" name="mahd" placeholder="Nhập số hoá đơn" oninput="validatePhoneNumber(this)">
+            <input type="tel" id="sdt" name="mahd" placeholder="Nhập số hoá đơn" oninput="validatePhoneNumber(this) required ">
         </div>
         <div>
             
@@ -268,7 +291,7 @@ input[type="submit"]:active {
       
 <div id="orderList">
 
-    <?php if(mysqLi_num_rows($danhsachdoitra)>0){?>
+    <?php if(mysqLi_num_rows($danhsachdoitra)>0 && $tgbaohanh <=7){?>
         <h1>DANH SÁCH ĐƠN HÀNG</h1>
     <div class="order-table-container">
     <table class="product-table" >
@@ -298,7 +321,7 @@ input[type="submit"]:active {
         <td><?php echo $row['mahd'] ?></td>
         <td><?php echo $row['masp'] ?></td>
         <td><?php echo $row['tensp'] ?></td>
-        <td><?php echo $row['dongia'] ?></td>
+        <td><?php echo number_format($row['dongia'], 0, ',', '.')?>đ</td>
         <td><?php echo $row['soluong']  ?></td>
         <td><input type="checkbox"></td>
       </tr>
@@ -316,7 +339,6 @@ input[type="submit"]:active {
   <?php 
     }else{
 ?>
-<h1>Nhập mã hoá đơn để tìm sản phẩm cần đổi</h1>
 <?php } ?>
 </div>
 </div>
@@ -368,18 +390,233 @@ input[type="submit"]:active {
     });
 });
 
+
+
+    // Kiểm tra nếu trường "mahd" không rỗng
+    function validateForm() {
+        const mahdInput = document.getElementById('sdt').value.trim();
+
+        if (mahdInput === '') {
+            alert('Vui lòng nhập số hóa đơn!');
+            return false; // Ngăn không cho gửi form
+        }
+
+        return true; // Cho phép gửi form
+    }
+
+    // Hàm kiểm tra số hóa đơn
+    function validatePhoneNumber(input) {
+        const value = input.value;
+        const regex = /^[0-9]*$/; // Chỉ cho phép nhập số
+
+        if (!regex.test(value)) {
+            input.setCustomValidity('Số hóa đơn chỉ được chứa các chữ số.');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
 </script>
 
-<?php
-if(isset($_SESSION['thongbao'])){
-$thongbao = addslashes($_SESSION['thongbao']);
-echo "<script>
-    window.onload = function() {
-        alert('$thongbao');
-    }
-</script>";
-unset($_SESSION['thongbao']);
+</script>
+
+<?php 
+if (isset($_SESSION['thongbao'])) {
+  ?>
+<style>
+    /* Nền tối của popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Ẩn popup mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung chính của popup */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 2px solid #6a0dad; /* Đường viền tím */
+}
+
+/* Biểu tượng thành công */
+.popup-content i {
+    font-size: 50px;
+    color:rgb(239, 29, 29); /* Màu xanh lá cây */
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề của popup */
+.popup-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color:rgb(210, 10, 10); /* Màu xanh lá cây */
+    margin: 10px 0;
+}
+
+/* Nội dung thông báo */
+.popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Nút đóng popup */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000; /* Màu đỏ */
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: #000;
+}
+</style>
+  <?php
+    echo "<div id='popup' class='popup'>
+            <div class='popup-content'>
+              <span class='close'>&times;</span>
+        <i class='fa fa-times-circle' style='color: red;'></i>
+              <h3>THÔNG BÁO</h3>
+              <p>" . $_SESSION['thongbao'] . "</p>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.popup .close');
+                
+                // Hiển thị popup khi trang tải xong
+                popup.style.display = 'flex';
+
+                // Đóng popup khi nhấn nút close
+                closeBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                });
+
+                // Tự động đóng popup sau 5 giây
+                setTimeout(function () {
+                    popup.style.display = 'none';
+                }, 5000);
+            });
+          </script>";
+    unset($_SESSION['thongbao']);
 }
 ?>
 
+
+
+<?php 
+if (isset($_SESSION['thanhcong'])) {
+  ?>
+<style>
+    /* Nền tối của popup */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; /* Ẩn popup mặc định */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Nội dung chính của popup */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 2px solid #6a0dad; /* Đường viền tím */
+}
+
+/* Biểu tượng thành công */
+.popup-content i {
+    font-size: 50px;
+    color:rgb(33, 251, 62); /* Màu xanh lá cây */
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề của popup */
+.popup-content h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color::rgb(33, 251, 62); /* Màu xanh lá cây */
+    margin: 10px 0;
+}
+
+/* Nội dung thông báo */
+.popup-content p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+/* Nút đóng popup */
+.popup .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff0000; /* Màu đỏ */
+    cursor: pointer;
+}
+
+.popup .close:hover {
+    color: #000;
+}
+</style>
+  <?php
+    echo "<div id='popup' class='popup'>
+            <div class='popup-content'>
+              <span class='close'>&times;</span>
+        <i class='fa fa-check-circle'></i>
+              <h3>THÔNG BÁO</h3>
+              <p>" . $_SESSION['thanhcong'] . "</p>
+            </div>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('popup');
+                const closeBtn = document.querySelector('.popup .close');
+                
+                // Hiển thị popup khi trang tải xong
+                popup.style.display = 'flex';
+
+                // Đóng popup khi nhấn nút close
+                closeBtn.addEventListener('click', function () {
+                    popup.style.display = 'none';
+                });
+
+                // Tự động đóng popup sau 5 giây
+                setTimeout(function () {
+                    popup.style.display = 'none';
+                }, 5000);
+            });
+          </script>";
+    unset($_SESSION['thanhcong']);
+}
+?>
+        
         
